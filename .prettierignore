@@ -1,0 +1,12 @@
+**/node_modules/
+**/dist/
+**/build/
+**/coverage/
+**/tsp-output/
+**/schema.d.ts
+**/playwright-report/
+**/test-results/
+package-lock.json
+
+# Hexlet-managed — do not reformat
+README.md
