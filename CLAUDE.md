@@ -134,6 +134,22 @@ next version and the changelog from this history.
   `CHANGELOG.md`) from the Conventional Commit history; config in `release-please-config.json`
   - `.release-please-manifest.json`. Merging that PR cuts the release.
 
+## Docker & deploy
+
+- **Single image, single port.** The root `Dockerfile` (multi-stage) builds the SPA and the
+  Nest server, then runs `node apps/backend/dist/main.js`. The container listens on
+  **`process.env.PORT`** (bound to `0.0.0.0`); `PORT` is injected by the host (Render / the
+  Hexlet grader). Build/run locally: `docker build -t calls-app . && docker run -e PORT=10000 -p 10000:10000 calls-app`.
+- **Backend serves the SPA + API on one origin.** In production the React build is served by
+  Nest via `@nestjs/serve-static` (registered in `src/app.module.ts` **only when the build dir
+  exists**, so local dev and the Jest e2e suite are unaffected). API stays at the contract's
+  root paths; `exclude` keeps unknown API paths returning JSON, and unknown GETs fall back to
+  `index.html` for SPA routing.
+- **Frontend API base.** The SPA is built with `VITE_API_BASE_URL=""` so it calls the API
+  same-origin (no `/api` prefix, no proxy). Dev still uses the `/api` Vite proxy (env unset).
+- **Deploy:** Render web service (Docker) from the public repo, branch `main`; the live URL is
+  in `README.md`. The in-memory store resets on each redeploy/spin-up.
+
 ## Hard constraints — do not violate
 
 - **Never** edit, rename, or delete `.github/workflows/hexlet-check.yml`. It runs the
